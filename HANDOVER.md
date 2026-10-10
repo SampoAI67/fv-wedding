@@ -35,7 +35,13 @@ Stack: **Astro 7 + GSAP (ScrollTrigger, DrawSVG) + Lenis**, static. Dev: preview
 - The Browser pane doesn't play animations. QA uses Playwright with system Edge: `tools/qa.py` (full walk), `qa2.py W H TAG STEPS` (journey steps), `qa3.py` (RSVP). Run them with the Gabriel venv python; screenshots go to `qa/`.
 - On a resize the journey timeline replays to the same progress, so the camera re-fits (`refresh` listener).
 
+## Deploy
+- **Live: https://sampoai67.github.io/fv-wedding/**. Repo: https://github.com/SampoAI67/fv-wedding. It's **public**, because Pages needs that on the free plan, and the page itself is `noindex`.
+- Every push to `main` rebuilds and deploys via `.github/workflows/deploy.yml` (withastro/action, path `./site`).
+- `astro.config.mjs` sets `base: '/fv-wedding'`. Public files referenced from markup must go through `asset()` (`src/lib/asset.ts`). CSS `url('/img/…')` is rewritten automatically.
+- Git's stored credential is the Echelonn account. Push with
+  `git -c credential.helper= -c "credential.helper=!gh auth git-credential" push` (gh's active account is SampoAI67).
+
 ## Not done / ideas
-- Not deployed. GitHub Pages or Vercel would both work (static `dist/`).
 - No music. An optional ambient track toggle would suit the gate, if the couple has a song.
 - A gift-list (IBAN) section: only if the couple wants it.
