@@ -1,0 +1,258 @@
+---
+import { asset } from '../lib/asset';
+import { COUPLE, HERO, RUNE_NAMES, WEDDING } from '../data/content';
+---
+
+<section class="hero" id="main" aria-label="Save the date">
+  <div class="hero__sticky">
+    <div class="hero__media">
+      <img
+        src={asset("/img/hero.webp")}
+        srcset={`${asset("/img/hero-900.webp")} 900w, ${asset("/img/hero.webp")} 1376w`}
+        sizes="100vw"
+        width="1376"
+        height="768"
+        alt="Colline di lavanda e una betulla solitaria all’alba, con le montagne all’orizzonte"
+        fetchpriority="high"
+      />
+    </div>
+    <div class="hero__rays" aria-hidden="true"></div>
+    <div class="hero__mist hero__mist--a" aria-hidden="true"></div>
+    <div class="hero__mist hero__mist--b" aria-hidden="true"></div>
+    <canvas class="hero__motes" aria-hidden="true"></canvas>
+
+    <div class="hero__copy">
+      <p class="hero__kicker kicker" data-hero-in>
+        <span class="rule" aria-hidden="true"></span>{HERO.kicker}<span class="rule" aria-hidden="true"></span>
+      </p>
+      <p class="hero__runes runes" aria-hidden="true" data-hero-in>{RUNE_NAMES}</p>
+      <h1 class="hero__names">
+        <span class="hero__name" data-hero-name>{COUPLE.bride}</span>
+        <span class="hero__and" data-hero-name>e</span>
+        <span class="hero__name" data-hero-name>{COUPLE.groom}</span>
+      </h1>
+      <p class="hero__date" data-hero-in>{WEDDING.dateLong}</p>
+      <p class="hero__place" data-hero-in>{WEDDING.venue} · {WEDDING.town}</p>
+    </div>
+
+    <a class="hero__cue" href="#viaggio" data-hero-in>
+      <span>{HERO.cue}</span>
+      <span class="hero__cue-line" aria-hidden="true"></span>
+    </a>
+
+    <div class="hero__cloud" aria-hidden="true"></div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    height: 230svh;
+    background: #ece6f0;
+  }
+
+  .hero__sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  .hero__media {
+    position: absolute;
+    inset: 0;
+    transform-origin: 62% 70%;
+  }
+  .hero__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 62% 50%;
+  }
+
+  /* sunbeams spilling from the sun in the upper-left of the painting */
+  .hero__rays {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 45% 40% at 18% 22%, rgb(255 236 180 / 0.55), transparent 70%),
+      repeating-conic-gradient(from 100deg at 18% 18%, rgb(255 240 200 / 0.18) 0deg 3deg, transparent 3deg 11deg);
+    mask-image: radial-gradient(ellipse 80% 70% at 18% 18%, #000 10%, transparent 75%);
+    mix-blend-mode: screen;
+    animation: rays 9s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes rays {
+    from {
+      opacity: 0.55;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .hero__mist {
+    position: absolute;
+    left: -30%;
+    width: 160%;
+    height: 32%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgb(244 240 250 / 0.75), rgb(236 230 244 / 0) 70%);
+    filter: blur(14px);
+    pointer-events: none;
+  }
+  .hero__mist--a {
+    top: 44%;
+    animation: drift 38s linear infinite alternate;
+  }
+  .hero__mist--b {
+    top: 58%;
+    opacity: 0.6;
+    animation: drift 52s linear infinite alternate-reverse;
+  }
+  @keyframes drift {
+    from {
+      transform: translateX(-8%);
+    }
+    to {
+      transform: translateX(8%);
+    }
+  }
+
+  .hero__motes {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .hero__copy {
+    position: absolute;
+    inset: 0 0 auto 0;
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: clamp(84px, 13svh, 140px) var(--pad) 0;
+    text-align: center;
+    color: var(--dusk-ink);
+  }
+  /* soft dawn halo so the ink stays readable over the clouds */
+  .hero__copy::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    width: min(900px, 120vw);
+    height: 140%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at center, rgb(255 249 236 / 0.7), rgb(255 249 236 / 0) 62%);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .hero__kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--lavender-deep);
+  }
+  .rule {
+    width: clamp(28px, 6vw, 64px);
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+  }
+
+  .hero__runes {
+    font-size: 0.9rem;
+    color: rgb(93 78 140 / 0.75);
+  }
+
+  .hero__names {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    column-gap: 0.25em;
+    margin-top: 4px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(3.4rem, 12.5vw, 8.6rem);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    text-shadow: 0 0 30px rgb(255 248 230 / 0.8);
+  }
+  .hero__name {
+    display: inline-block;
+  }
+  .hero__and {
+    display: inline-block;
+    font-size: 0.5em;
+    color: var(--lavender-deep);
+  }
+
+  .hero__date {
+    margin-top: 10px;
+    font-family: var(--display);
+    font-size: clamp(0.95rem, 2.6vw, 1.25rem);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .hero__place {
+    font-size: clamp(1.05rem, 2.6vw, 1.25rem);
+    font-style: italic;
+    color: rgb(42 33 64 / 0.82);
+  }
+
+  .hero__cue {
+    position: absolute;
+    left: 50%;
+    bottom: max(28px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    font-family: var(--display);
+    font-size: 0.74rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #fffaf0;
+    text-shadow: 0 1px 12px rgb(30 22 50 / 0.7);
+  }
+  .hero__cue-line {
+    width: 1px;
+    height: 46px;
+    background: linear-gradient(#fffaf0, transparent);
+    transform-origin: top;
+    animation: cue 2.4s var(--ease-out) infinite;
+  }
+  @keyframes cue {
+    0% {
+      transform: scaleY(0);
+      opacity: 1;
+    }
+    70% {
+      transform: scaleY(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scaleY(1);
+      opacity: 0;
+    }
+  }
+
+  .hero__cloud {
+    position: absolute;
+    inset: -20% -10%;
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 70%, #f6f2f8 20%, transparent 70%),
+      radial-gradient(ellipse 60% 45% at 75% 60%, #efe8f4 25%, transparent 72%),
+      linear-gradient(rgb(236 230 240 / 0), #ece6f0 55%);
+    opacity: 0;
+    transform: translateY(40%);
+    pointer-events: none;
+  }
+</style>

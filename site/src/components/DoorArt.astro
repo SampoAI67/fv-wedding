@@ -1,0 +1,84 @@
+---
+/*
+  The engraved design on the two door leaves. Rendered once per leaf (each leaf clips its half),
+  so both halves animate in lockstep. Original design, not a copy of any film prop:
+  two birches (for "La Betulla") instead of trees of the gate, interlocked wedding rings
+  instead of a star, lavender from the printed save-the-date.
+*/
+import { COUPLE } from '../data/content';
+
+const leaves: string[] = [];
+const branchLeaves: [number, number, number][] = [
+  [262, 168, -40], [248, 182, -25], [236, 200, -55], [224, 214, -20], [210, 236, -50],
+  [200, 256, -15], [236, 300, -35], [226, 316, -60], [214, 332, -25], [172, 240, -100],
+  [166, 262, -120], [180, 286, -80], [196, 226, -70], [252, 160, -10],
+];
+for (const [x, y, a] of branchLeaves) {
+  leaves.push(`<path d="M0 0 q 7 -5 14 0 q -7 5 -14 0" transform="translate(${x} ${y}) rotate(${a})"/>`);
+}
+const barkY = [770, 724, 676, 628, 572, 520, 470, 420, 384];
+const bark = barkY.map((y, i) => `M${i % 2 ? 153 : 156} ${y} h${i % 2 ? 8 : 6}`).join(' ');
+
+const stars = Array.from({ length: 7 }, (_, i) => {
+  const t = ((50 + (i * 80) / 6) * Math.PI) / 180;
+  const x = 300 + 162 * Math.cos(t);
+  const y = 300 - 162 * Math.sin(t);
+  const r = i === 3 ? 9 : 6;
+  return `M${x} ${y - r} L${x + r * 0.28} ${y - r * 0.28} L${x + r} ${y} L${x + r * 0.28} ${y + r * 0.28} L${x} ${y + r} L${x - r * 0.28} ${y + r * 0.28} L${x - r} ${y} L${x - r * 0.28} ${y - r * 0.28} Z`;
+});
+
+const rays = Array.from({ length: 16 }, (_, i) => {
+  const t = (i / 16) * Math.PI * 2;
+  const r1 = i % 2 ? 64 : 60;
+  const r2 = i % 2 ? 74 : 84;
+  return `M${300 + r1 * Math.cos(t)} ${400 + r1 * Math.sin(t)} L${300 + r2 * Math.cos(t)} ${400 + r2 * Math.sin(t)}`;
+}).join(' ');
+
+const lavender = [232, 262, 300, 338, 368].map((x, i) => {
+  const top = 690 + (i % 2) * 18 + (i === 2 ? -14 : 0);
+  const lean = (x - 300) * 0.12;
+  const buds = Array.from({ length: 6 }, (_, k) => {
+    const yy = top + k * 9;
+    const xx = x + lean * (1 - (yy - top) / 110);
+    return `M${xx - 3} ${yy} q 3 -5 6 0 q -3 5 -6 0`;
+  }).join(' ');
+  return { stem: `M${x} 800 Q ${x + lean * 0.4} 760 ${x + lean} ${top}`, buds };
+});
+---
+
+<g class="door-art">
+  <!-- birch: left tree, mirrored for the right one -->
+  {
+    [false, true].map((mirror) => (
+      <g transform={mirror ? 'translate(600 0) scale(-1 1)' : undefined}>
+        <path class="ln" d="M150 800 C148 690 156 600 150 500 C146 430 150 380 168 330" />
+        <path class="ln" d="M166 800 C164 690 170 600 166 500 C162 432 166 384 182 336" />
+        <path class="ln ln--fine" d={bark} />
+        <path class="ln" d="M175 336 C190 270 222 212 262 168" />
+        <path class="ln ln--fine" d="M170 384 C196 362 222 334 236 300" />
+        <path class="ln ln--fine" d="M172 332 C184 300 178 264 168 236" />
+        <path class="ln ln--fine" d="M210 234 C202 228 196 226 186 228" />
+        <g class="ln ln--leaf" set:html={leaves.join('')} />
+      </g>
+    ))
+  }
+
+  <!-- seven stars -->
+  {stars.map((d) => <path class="ln ln--star" d={d} />)}
+
+  <!-- the emblem: two interlocked rings in a sunburst -->
+  <path class="ln ln--fine" d={rays} />
+  <circle class="ln ln--ring" cx="281" cy="400" r="36" />
+  <circle class="ln ln--ring" cx="319" cy="400" r="36" />
+  <text class="door-mono" x="300" y="530" text-anchor="middle">{COUPLE.monogram}</text>
+
+  <!-- lavender at the threshold -->
+  {
+    lavender.map((l) => (
+      <g>
+        <path class="ln ln--fine" d={l.stem} />
+        <path class="ln ln--bud" d={l.buds} />
+      </g>
+    ))
+  }
+</g>

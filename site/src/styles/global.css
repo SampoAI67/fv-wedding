@@ -1,0 +1,306 @@
+/*
+  Federica & Valentino - an invitation told as a journey.
+  Palette comes from the printed save-the-date: lavender, sage, ivory, gold.
+  Three "lights": moonlit stone (the gate), dawn (the hero), parchment (the map + RSVP).
+  Z-index scale lives here and nowhere else.
+*/
+
+:root {
+  --night: #0b0c12;
+  --night-2: #151724;
+  --ithildin: #dbe6ff;
+  --moon: #aebfff;
+
+  --paper: #efe4cb;
+  --paper-2: #e3d3b0;
+  --ink: #33281a;
+  --ink-soft: #5e4f39;
+  --route: #8b3a2b;
+
+  --lavender: #9b8cc6;
+  --lavender-deep: #5d4e8c;
+  --sage: #6e8a68;
+  --sage-deep: #3e5240;
+  --gold: #b88a2e;
+  --gold-bright: #f2cf7c;
+  --ember: #ff8a3d;
+
+  --dusk-ink: #2a2140;
+
+  --display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --serif: 'Cormorant Garamond', 'Cormorant', Georgia, serif;
+  --runic: 'Noto Sans Runic', 'Segoe UI Historic', serif;
+
+  --pad: clamp(16px, 3vw, 40px);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --z-base: 0;
+  --z-content: 2;
+  --z-card: 10;
+  --z-header: 50;
+  --z-gate: 100;
+  --z-toast: 120;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  background: var(--night);
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.1875rem;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--night);
+  overflow-x: clip;
+}
+
+body.is-locked {
+  overflow: hidden;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: calc(var(--z-gate) + 1);
+  padding: 10px 16px;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 999px;
+}
+.skip-link:focus {
+  top: 12px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 3px;
+}
+
+/* ---------- shared type ---------- */
+
+.kicker {
+  font-family: var(--display);
+  font-size: 0.72rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.runes {
+  font-family: var(--runic);
+  letter-spacing: 0.18em;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  min-height: 48px;
+  padding: 0.7em 1.6em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  font-family: var(--display);
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.3s var(--ease-out),
+    color 0.3s var(--ease-out),
+    transform 0.3s var(--ease-out);
+}
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn--ink {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+.btn--ink:hover {
+  background: var(--lavender-deep);
+  border-color: var(--lavender-deep);
+}
+
+/* ---------- parchment surface (map cards + RSVP letter) ---------- */
+
+.parchment {
+  position: relative;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 50% 40%, rgb(255 250 235 / 0.55), transparent 70%),
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgb(120 84 40 / 0.28) 100%),
+    url('/img/paper.webp');
+  background-size: cover, cover, 900px auto;
+  background-blend-mode: normal, multiply, multiply;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.4) inset,
+    0 30px 60px -20px rgb(20 12 4 / 0.55),
+    0 8px 18px rgb(20 12 4 / 0.25);
+}
+.parchment::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgb(51 40 26 / 0.35);
+  outline: 1px solid rgb(51 40 26 / 0.18);
+  outline-offset: 3px;
+  pointer-events: none;
+}
+
+/* ---------- header ---------- */
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: var(--z-header);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px var(--pad);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out);
+}
+.site-header.is-visible {
+  opacity: 1;
+}
+.site-header > * {
+  pointer-events: auto;
+}
+.monogram {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgb(239 228 203 / 0.92);
+  border: 1px solid rgb(51 40 26 / 0.35);
+  font-family: var(--display);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+}
+.header-rsvp {
+  min-height: 44px;
+  padding: 0.55em 1.2em;
+  background: rgb(239 228 203 / 0.92);
+  border-color: rgb(51 40 26 / 0.35);
+  color: var(--ink);
+  font-size: 0.72rem;
+  backdrop-filter: blur(6px);
+}
+.header-rsvp:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ---------- toast ---------- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: var(--z-toast);
+  width: min(92vw, 440px);
+  padding: 14px 18px;
+  transform: translate(-50%, calc(100% + 48px));
+  visibility: hidden;
+  border-radius: 14px;
+  background: var(--night-2);
+  color: var(--paper);
+  font-size: 1rem;
+  line-height: 1.4;
+  box-shadow: 0 20px 40px rgb(0 0 0 / 0.4);
+  transition:
+    transform 0.5s var(--ease-out),
+    visibility 0s 0.5s;
+}
+.toast.is-visible {
+  transform: translate(-50%, 0);
+  visibility: visible;
+  transition: transform 0.5s var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,296 @@
+---
+import { asset } from '../lib/asset';
+import DoorArt from './DoorArt.astro';
+import { GATE, RUNE_ARCH } from '../data/content';
+
+const DOOR = 'M110 800 L110 300 A190 190 0 0 1 490 300 L490 800 Z';
+const HALF_L = 'M110 800 L110 300 A190 190 0 0 1 300 110 L300 800 Z';
+const HALF_R = 'M300 110 A190 190 0 0 1 490 300 L490 800 L300 800 Z';
+---
+
+<div class="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" data-gate>
+  <div class="gate__bg" aria-hidden="true"></div>
+  <div class="gate__moon" aria-hidden="true"></div>
+  <canvas class="gate__dust" aria-hidden="true"></canvas>
+
+  <p class="gate__kicker kicker" id="gate-title">{GATE.kicker}</p>
+
+  <div class="gate__stage" aria-hidden="true">
+    <div class="gate__shake">
+      <!-- light behind the doors -->
+      <svg class="gate__svg gate__light" viewBox="0 0 600 820">
+        <defs>
+          <radialGradient id="gateLight" cx="50%" cy="62%" r="70%">
+            <stop offset="0" stop-color="#fffaf0" />
+            <stop offset="0.35" stop-color="#ffe7ad" />
+            <stop offset="0.8" stop-color="#e3a64a" />
+            <stop offset="1" stop-color="#7a4a1c" />
+          </radialGradient>
+          <pattern id="stonePat" patternUnits="userSpaceOnUse" width="600" height="820">
+            <image href={asset("/img/stone.webp")} width="600" height="820" preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+          <clipPath id="clipL"><path d={HALF_L} /></clipPath>
+          <clipPath id="clipR"><path d={HALF_R} /></clipPath>
+        </defs>
+        <path class="gate__glowpath" d={DOOR} fill="url(#gateLight)" />
+      </svg>
+
+      <!-- the two leaves -->
+      {
+        ['l', 'r'].map((side) => (
+          <svg class={`gate__svg gate__door gate__door--${side}`} viewBox="0 0 600 820">
+            <g clip-path={`url(#clip${side.toUpperCase()})`}>
+              <rect class="door-slab" width="600" height="820" fill="url(#stonePat)" />
+              <rect class="door-shade" width="600" height="820" />
+              <DoorArt />
+              <path class="ln door-edge" d={side === 'l' ? HALF_L : HALF_R} />
+            </g>
+          </svg>
+        ))
+      }
+
+      <!-- the fixed frame: columns, arch and inscription -->
+      <svg class="gate__svg gate__frame" viewBox="0 0 600 820">
+        <path id="archText" d="M96 300 A204 204 0 0 1 504 300" fill="none" />
+        <g class="frame-art">
+          <path class="ln" d="M70 300 A230 230 0 0 1 530 300" />
+          <path class="ln ln--fine" d="M80 300 A220 220 0 0 1 520 300" />
+          <path class="ln" d="M110 300 A190 190 0 0 1 490 300" />
+          <path class="ln" d="M70 300 V800 M110 300 V800 M490 300 V800 M530 300 V800" />
+          <path class="ln ln--fine" d="M84 318 V784 M96 318 V784 M504 318 V784 M516 318 V784" />
+          <path
+            class="ln"
+            d="M58 300 H122 M62 290 H118 M478 300 H542 M482 290 H538 M58 800 H122 M54 812 H126 M478 800 H542 M474 812 H546"
+          />
+          <path
+            class="ln ln--fine"
+            d="M62 290 c-10 0 -12 -12 -2 -14 c6 -1 8 6 3 8 M118 290 c10 0 12 -12 2 -14 c-6 -1 -8 6 -3 8 M482 290 c-10 0 -12 -12 -2 -14 c6 -1 8 6 3 8 M538 290 c10 0 12 -12 2 -14 c-6 -1 -8 6 -3 8"
+          />
+          <path class="ln" d="M288 66 L300 50 L312 66 L300 80 Z" />
+          <path class="ln ln--fine" d="M20 824 H580" />
+        </g>
+        <text class="arch-runes"><textPath href="#archText" startOffset="50%" text-anchor="middle">{RUNE_ARCH}</textPath></text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="gate__copy">
+    <p class="gate__riddle">{GATE.riddle}</p>
+    <p class="gate__hint">{GATE.hint}</p>
+    <button class="gate__word" type="button" data-gate-open>
+      <span class="gate__word-label">{GATE.password}</span>
+    </button>
+  </div>
+
+  <div class="gate__flash" aria-hidden="true"></div>
+</div>
+
+<style>
+  .gate {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-gate);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    justify-items: center;
+    align-items: center;
+    padding: max(18px, env(safe-area-inset-top)) var(--pad) max(22px, env(safe-area-inset-bottom));
+    overflow: hidden;
+    background: var(--night);
+    color: var(--ithildin);
+  }
+
+  .gate__bg {
+    position: absolute;
+    inset: -4%;
+    background:
+      radial-gradient(ellipse 60% 55% at 50% 48%, rgb(40 52 86 / 0.25), transparent 70%),
+      radial-gradient(ellipse at 50% 50%, transparent 30%, rgb(5 6 10 / 0.92) 85%),
+      linear-gradient(rgb(16 20 34 / 0.55), rgb(8 9 14 / 0.75)),
+      url('/img/stone.webp') center / cover;
+    filter: brightness(0.75) saturate(0.8);
+  }
+
+  .gate__moon {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 78% 6%, rgb(190 206 255 / 0.35), rgb(150 170 255 / 0.08) 28%, transparent 50%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .gate__dust {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .gate__kicker {
+    position: relative;
+    color: rgb(219 230 255 / 0.7);
+    opacity: 0;
+  }
+
+  .gate__stage {
+    position: relative;
+    height: min(64svh, 112vw);
+    aspect-ratio: 600 / 820;
+    perspective: 1400px;
+  }
+
+  .gate__shake {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  .gate__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .gate__light {
+    opacity: 0;
+  }
+
+  .gate__door {
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+  .gate__door--l {
+    transform-origin: 18.333% 50%;
+  }
+  .gate__door--r {
+    transform-origin: 81.667% 50%;
+  }
+
+  .gate__door,
+  .gate__frame {
+    filter: drop-shadow(0 0 3px rgb(170 196 255 / 0.85)) drop-shadow(0 0 14px rgb(120 150 255 / 0.4));
+  }
+
+  :global(.door-slab) {
+    opacity: 0;
+  }
+  :global(.door-shade) {
+    fill: rgb(6 8 14 / 0.55);
+    opacity: 0;
+  }
+
+  .gate :global(.ln) {
+    fill: none;
+    stroke: var(--ithildin);
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .gate :global(.ln--fine) {
+    stroke-width: 1.1;
+  }
+  .gate :global(.ln--leaf),
+  .gate :global(.ln--bud) {
+    stroke-width: 1;
+  }
+  .gate :global(.ln--ring) {
+    stroke-width: 2.2;
+  }
+  .gate :global(.door-mono) {
+    fill: var(--ithildin);
+    font-family: var(--display);
+    font-size: 26px;
+    letter-spacing: 0.12em;
+  }
+
+  .arch-runes {
+    fill: var(--ithildin);
+    font-family: var(--runic);
+    font-size: 21px;
+    letter-spacing: 0.24em;
+  }
+
+  .gate__copy {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    text-align: center;
+  }
+
+  .gate__riddle {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1.5rem, 5.4vw, 2.2rem);
+    line-height: 1.15;
+    color: #eef2ff;
+    opacity: 0;
+  }
+
+  .gate__hint {
+    max-width: 30ch;
+    font-size: 0.98rem;
+    color: rgb(219 230 255 / 0.62);
+    opacity: 0;
+  }
+
+  .gate__word {
+    position: relative;
+    margin-top: 10px;
+    min-height: 52px;
+    padding: 0.7em 2.2em;
+    border: 1px solid rgb(219 230 255 / 0.55);
+    border-radius: 999px;
+    background: rgb(20 26 44 / 0.55);
+    color: #f3f6ff;
+    font-family: var(--display);
+    font-size: 1rem;
+    letter-spacing: 0.42em;
+    text-indent: 0.42em;
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0;
+    box-shadow: 0 0 0 0 rgb(170 196 255 / 0.5);
+    transition:
+      background-color 0.4s var(--ease-out),
+      box-shadow 0.4s var(--ease-out);
+    animation: gate-pulse 2.8s ease-in-out infinite;
+    animation-play-state: paused;
+  }
+  .gate__word.is-ready {
+    animation-play-state: running;
+  }
+  .gate__word:hover {
+    background: rgb(60 74 120 / 0.6);
+  }
+  .gate__word:disabled {
+    cursor: default;
+    animation: none;
+  }
+
+  @keyframes gate-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgb(170 196 255 / 0.4);
+    }
+    50% {
+      box-shadow: 0 0 26px 4px rgb(170 196 255 / 0.28);
+    }
+  }
+
+  .gate__flash {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 58%, #fffdf6, #ffeec4 45%, #f3d6a0);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .gate.is-gone {
+    display: none;
+  }
+</style>

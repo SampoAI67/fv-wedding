@@ -1,0 +1,116 @@
+---
+import { COUPLE, FINALE, RUNE_NAMES, WEDDING } from '../data/content';
+---
+
+<section class="finale" aria-label="Fine">
+  <canvas class="finale__flies" aria-hidden="true"></canvas>
+  <div class="finale__copy" data-reveal>
+    <p class="finale__line">{FINALE.line}</p>
+    <p class="finale__names">{COUPLE.bride} <span>e</span> {COUPLE.groom}</p>
+    <p class="finale__date kicker">{WEDDING.dateShort} · {WEDDING.town}</p>
+    <p class="finale__runes runes" aria-hidden="true">{RUNE_NAMES}</p>
+    <p class="finale__farewell">
+      <span lang="qya">{FINALE.farewell}</span>
+      <small>{FINALE.farewellGloss}</small>
+    </p>
+  </div>
+  <footer class="finale__foot">
+    <a href="#main" class="finale__top">Rifai il viaggio</a>
+  </footer>
+</section>
+
+<style>
+  .finale {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 100svh;
+    padding: 120px var(--pad) 90px;
+    overflow: hidden;
+    color: #f3ecdc;
+    text-align: center;
+    background:
+      linear-gradient(#0e0e18, rgb(14 14 24 / 0) 30%, rgb(14 14 24 / 0) 70%, #0b0b12),
+      url('/img/sky.webp') center / cover;
+  }
+
+  .finale__flies {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .finale__copy {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+    max-width: 760px;
+  }
+
+  .finale__line {
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1.5rem, 4.4vw, 2.6rem);
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+  .finale__names {
+    margin-top: 18px;
+    font-family: var(--display);
+    font-size: clamp(1.6rem, 5vw, 3rem);
+    letter-spacing: 0.08em;
+    color: var(--gold-bright);
+    text-shadow: 0 0 30px rgb(242 207 124 / 0.35);
+  }
+  .finale__names span {
+    font-family: var(--serif);
+    font-style: italic;
+    text-transform: none;
+    color: #f3ecdc;
+  }
+  .finale__date {
+    color: rgb(243 236 220 / 0.75);
+  }
+  .finale__runes {
+    color: rgb(190 178 230 / 0.7);
+    font-size: 0.95rem;
+  }
+  .finale__farewell {
+    display: grid;
+    gap: 2px;
+    margin-top: 26px;
+  }
+  .finale__farewell span {
+    font-style: italic;
+    font-size: 1.8rem;
+  }
+  .finale__farewell small {
+    font-size: 1rem;
+    font-style: italic;
+    color: rgb(243 236 220 / 0.62);
+  }
+
+  .finale__foot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: max(22px, env(safe-area-inset-bottom));
+    display: flex;
+    justify-content: center;
+  }
+  .finale__top {
+    font-family: var(--display);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgb(243 236 220 / 0.7);
+    text-decoration: none;
+    padding: 12px;
+  }
+  .finale__top:hover {
+    color: var(--gold-bright);
+  }
+</style>

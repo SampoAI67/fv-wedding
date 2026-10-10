@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import Gate from '../components/Gate.astro';
+import Hero from '../components/Hero.astro';
+import Journey from '../components/Journey.astro';
+import Rsvp from '../components/Rsvp.astro';
+import Finale from '../components/Finale.astro';
+import { COUPLE } from '../data/content';
+---
+
+<Base>
+  <Gate />
+  <header class="site-header" data-header>
+    <a class="monogram" href="#main" aria-label="Torna all’inizio">{COUPLE.monogram}</a>
+    <a class="btn header-rsvp" href="#rsvp">Rispondi</a>
+  </header>
+  <main>
+    <Hero />
+    <Journey />
+    <Rsvp />
+    <Finale />
+  </main>
+  <div class="toast" role="status" aria-live="polite" data-toast></div>
+  <script>
+    import '../scripts/main';
+  </script>
+</Base>

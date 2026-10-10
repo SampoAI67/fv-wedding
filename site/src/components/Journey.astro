@@ -1,0 +1,728 @@
+---
+import { asset } from '../lib/asset';
+import {
+  WORLD, northRange, ridge, BEACONS, conteaHills, conteaDoors, trees, birches, village, venueHall, VENUE,
+  lunaHill, lunaTower, lunaMoon, lake, lakeShore, island, waves, serpent, river, tufts, fields, compass, ticks,
+  SEGMENTS,
+} from '../data/map';
+import { COUPLE, RUNE_NAMES, STOPS, WEDDING, toRunes } from '../data/content';
+
+const { contea, luna, fuochi, bosco, fine } = STOPS;
+const moonRunes = toRunes(luna.moonLetters).replace(/ ᛫ /g, ' ');
+const flame = 'M0 0 C-8 -6 -8 -16 -1 -30 C1 -22 5 -20 4 -12 C8 -16 9 -8 7 -4 C6 -1 3 0 0 0 Z';
+const flameCore = 'M0 0 C-4 -4 -4 -10 0 -18 C4 -10 4 -4 0 0 Z';
+---
+
+<section class="journey" id="viaggio" aria-label="La mappa del viaggio">
+  <div class="journey__stage">
+    <svg class="journey__map" viewBox={`0 0 ${WORLD.w} ${WORLD.h}`} preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <radialGradient id="emberGlow">
+          <stop offset="0" stop-color="#ffb35c" stop-opacity="0.85" />
+          <stop offset="0.45" stop-color="#ff7a2a" stop-opacity="0.35" />
+          <stop offset="1" stop-color="#ff5a1a" stop-opacity="0" />
+        </radialGradient>
+        <linearGradient id="flameGrad" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="#c2410c" />
+          <stop offset="0.5" stop-color="#f97316" />
+          <stop offset="1" stop-color="#fcd34d" />
+        </linearGradient>
+        <radialGradient id="starGlow">
+          <stop offset="0" stop-color="#ffe9a8" stop-opacity="0.9" />
+          <stop offset="1" stop-color="#f2cf7c" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="paperVignette" cx="50%" cy="50%" r="70%">
+          <stop offset="0.55" stop-color="#7a5326" stop-opacity="0" />
+          <stop offset="1" stop-color="#5a3a16" stop-opacity="0.42" />
+        </radialGradient>
+        {
+          SEGMENTS.map((d, i) => (
+            <mask id={`segMask${i}`} maskUnits="userSpaceOnUse" x="0" y="0" width={WORLD.w} height={WORLD.h}>
+              <path class="seg-mask" data-seg={i} d={d} fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" />
+            </mask>
+          ))
+        }
+        {SEGMENTS.map((d, i) => <path id={`seg${i}`} d={d} fill="none" />)}
+        <path id="lblRange" d="M600 196 Q900 158 1240 190" fill="none" />
+        <path id="lblRidge" d="M772 596 Q1000 566 1228 478" fill="none" />
+        <path id="lblRiver" d="M300 690 C320 640 350 600 380 560" fill="none" />
+      </defs>
+
+      <!-- the table the map lies on -->
+      <rect x="-6000" y="-6000" width="13600" height="13100" fill="#1d150d" />
+      <rect x="-14" y="-10" width={WORLD.w + 28} height={WORLD.h + 26} fill="#000" opacity="0.35" />
+
+      <!-- paper -->
+      <image href={asset("/img/paper.webp")} x="0" y="0" width={WORLD.w} height={WORLD.h} preserveAspectRatio="xMidYMid slice" />
+      <rect width={WORLD.w} height={WORLD.h} fill="#e9d6ac" style="mix-blend-mode:multiply" opacity="0.55" />
+      <rect width={WORLD.w} height={WORLD.h} fill="url(#paperVignette)" />
+
+      <g class="map-ink">
+        <!-- border -->
+        <rect class="ink" x="24" y="24" width={WORLD.w - 48} height={WORLD.h - 48} />
+        <rect class="ink ink--fine" x="36" y="36" width={WORLD.w - 72} height={WORLD.h - 72} />
+        <path class="ink ink--fine" d={ticks} />
+
+        <!-- water -->
+        <path d={lake} fill="#5a6e8c" fill-opacity="0.16" stroke="none" />
+        <path class="ink" d={lakeShore} />
+        <path class="ink ink--fine" d={lakeShore} transform="translate(10 0)" opacity="0.55" />
+        <path class="ink ink--fine" d={lakeShore} transform="translate(20 0)" opacity="0.3" />
+        <path class="ink" d={island} fill="#efe1c2" />
+        <path class="ink ink--fine" d={waves.join(' ')} />
+        <path class="ink ink--fine" d={serpent} />
+        <path class="ink ink--river" d={river} />
+        <path class="ink ink--fine" d={river} transform="translate(5 2)" />
+
+        <!-- land texture -->
+        <path class="ink ink--faint" d={tufts.join(' ')} />
+        <path class="ink ink--faint" d={fields.join(' ')} />
+
+        <!-- northern range -->
+        {
+          northRange.map((m) => (
+            <g>
+              <path class="m-fill" d={m.fill} />
+              <path class="ink" d={m.ink} />
+              <path class="ink ink--fine" d={m.hatch} />
+            </g>
+          ))
+        }
+
+        <!-- woods -->
+        <path class="ink ink--tree" d={trees.join(' ')} />
+
+        <!-- the Contea -->
+        <path class="ink" d={conteaHills.join(' ')} />
+        <path class="ink ink--door" d={conteaDoors.join(' ')} />
+
+        <!-- Colle della Luna -->
+        <path class="ink" d={lunaHill} />
+        <path class="ink" d={lunaTower} fill="#efe1c2" />
+        <path class="ink moon" d={lunaMoon} />
+
+        <!-- beacon ridge -->
+        {
+          ridge.map((m) => (
+            <g>
+              <path class="m-fill" d={m.fill} />
+              <path class="ink" d={m.ink} />
+              <path class="ink ink--fine" d={m.hatch} />
+            </g>
+          ))
+        }
+        {
+          BEACONS.map(([x, y], i) => (
+            <g class="beacon" transform={`translate(${x} ${y})`} data-beacon={i}>
+              <path class="ink" d="M-7 0 L0 -12 L7 0 M-5 -4 H5 M-3 -8 H3" />
+              <g class="beacon__fire" transform="translate(0 -11)">
+                <circle class="beacon__glow" r="34" fill="url(#emberGlow)" />
+                <path class="beacon__flame" d={flame} fill="url(#flameGrad)" />
+                <path class="beacon__core" d={flameCore} fill="#fde68a" />
+              </g>
+            </g>
+          ))
+        }
+
+        <!-- birch wood, Serle and the venue -->
+        <path class="ink ink--tree" d={birches.join(' ')} />
+        <path class="ink" d={village} fill="#efe1c2" />
+        <path class="ink" d={venueHall} fill="#efe1c2" />
+        <g class="venue-star" transform={`translate(${VENUE[0]} ${VENUE[1] - 40})`}>
+          <circle r="34" fill="url(#starGlow)" />
+          <path d="M0 -16 L4 -4 L16 0 L4 4 L0 16 L-4 4 L-16 0 L-4 -4 Z" fill="#c89b3c" stroke="#5b3d10" stroke-width="1" />
+        </g>
+
+        <!-- compass -->
+        <g class="compass" transform={`translate(${compass.center[0]} ${compass.center[1]})`}>
+          <g transform={`translate(${-compass.center[0]} ${-compass.center[1]})`}>
+            <circle class="ink ink--fine" cx={compass.center[0]} cy={compass.center[1]} r="40" />
+            <circle class="ink ink--fine" cx={compass.center[0]} cy={compass.center[1]} r="44" />
+            <path class="ink" d={compass.rays} fill="#efe1c2" />
+          </g>
+        </g>
+
+        <!-- labels -->
+        <g class="labels">
+          <text class="lbl lbl--big"><textPath href="#lblRange" startOffset="50%" text-anchor="middle">Le Prealpi Nebbiose</textPath></text>
+          <text class="lbl lbl--mid"><textPath href="#lblRidge" startOffset="50%" text-anchor="middle">I Monti dei Fuochi</textPath></text>
+          <text class="lbl lbl--it"><textPath href="#lblRiver" startOffset="50%" text-anchor="middle">il Mella</textPath></text>
+          <text class="lbl lbl--mid" x="314" y="1000" text-anchor="middle">La Contea dei Due Sorrisi</text>
+          <text class="lbl lbl--mid" x="648" y="716" text-anchor="middle">Il Colle della Luna</text>
+          <text class="lbl lbl--mid" x="1262" y="724" text-anchor="middle">Il Bosco delle Betulle</text>
+          <text class="lbl lbl--it" x="1156" y="664" text-anchor="middle">Serle</text>
+          <text class="lbl lbl--it lbl--small" x={VENUE[0]} y={VENUE[1] + 30} text-anchor="middle">La Betulla</text>
+          <text class="lbl lbl--it" x="560" y="944" text-anchor="middle">Bosco Vecchio</text>
+          <text class="lbl lbl--it lbl--plain" x="840" y="1004" text-anchor="middle">La Pianura delle Nebbie</text>
+          <text class="lbl lbl--big" x="1512" y="600" text-anchor="middle" transform="rotate(-90 1512 600)">Il Grande Lago</text>
+          <text class="lbl lbl--it lbl--small" x="1486" y="452" text-anchor="middle">hic sunt dracones</text>
+          <text class="lbl lbl--mid" x={compass.center[0]} y={compass.center[1] - 62} text-anchor="middle">N</text>
+        </g>
+
+        <!-- cartouche -->
+        <g class="cartouche">
+          <rect class="ink" x="64" y="58" width="470" height="140" fill="#f1e4c6" />
+          <rect class="ink ink--fine" x="74" y="68" width="450" height="120" />
+          <path class="ink ink--fine" d="M64 58 l14 14 M534 58 l-14 14 M64 198 l14 -14 M534 198 l-14 -14" />
+          <text class="lbl lbl--it" x="299" y="104" text-anchor="middle">La Terra di</text>
+          <text class="lbl lbl--title" x="299" y="146" text-anchor="middle">{COUPLE.bride} e {COUPLE.groom}</text>
+          <text class="lbl lbl--runes" x="299" y="174" text-anchor="middle">{RUNE_NAMES}</text>
+        </g>
+      </g>
+
+      <!-- the route, drawn as the traveller walks it -->
+      <g class="route">
+        {SEGMENTS.map((d, i) => <path class="route__line" d={d} mask={`url(#segMask${i})`} />)}
+      </g>
+
+      <g class="traveller">
+        <circle class="traveller__pulse" r="14" />
+        <circle class="traveller__dot" r="8" />
+        <circle class="traveller__core" r="3" />
+      </g>
+    </svg>
+
+    <div class="journey__mist" aria-hidden="true"></div>
+
+    <!-- cards: one per stop -->
+    <article class="card card--center parchment" data-card="intro">
+      <p class="card__chapter kicker">La mappa del viaggio</p>
+      <p class="card__text">Segui il sentiero: ogni tappa custodisce una parte dell’invito.</p>
+      <p class="card__hint" aria-hidden="true">scorri per partire</p>
+    </article>
+
+    <article class="card parchment" data-card="contea">
+      <p class="card__chapter kicker">{contea.chapter} · {contea.place}</p>
+      <div class="card__head">
+        <div class="medallion">
+          <img src={asset("/img/coppia.webp")} alt={`${COUPLE.bride} e ${COUPLE.groom}`} width="640" height="640" loading="lazy" />
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <defs><path id="medRing" d="M100 100 m-86 0 a86 86 0 1 1 172 0 a86 86 0 1 1 -172 0" /></defs>
+            <circle cx="100" cy="100" r="96" fill="none" stroke="#5d4e8c" stroke-width="1.2" />
+            <circle cx="100" cy="100" r="76" fill="none" stroke="#5d4e8c" stroke-width="1.2" />
+            <text class="medallion__runes"><textPath href="#medRing">{RUNE_NAMES} ᛫ {RUNE_NAMES} ᛫</textPath></text>
+          </svg>
+        </div>
+        <h2 class="card__title">{contea.title}</h2>
+      </div>
+      <p class="card__text">{contea.text}</p>
+      <p class="card__invite">{contea.invite}</p>
+    </article>
+
+    <article class="card parchment" data-card="luna">
+      <p class="card__chapter kicker">{luna.chapter} · {luna.place}</p>
+      <p class="moon-letters" data-moon={luna.moonLetters} data-runes={moonRunes} aria-label={luna.moonLetters}>{moonRunes}</p>
+      <h2 class="card__title">{WEDDING.dateLong}</h2>
+      <p class="card__label kicker">Mancano</p>
+      <div class="countdown" data-countdown={WEDDING.iso} role="timer" aria-live="off">
+        <div><span data-unit="d">000</span><small>giorni</small></div>
+        <div><span data-unit="h">00</span><small>ore</small></div>
+        <div><span data-unit="m">00</span><small>minuti</small></div>
+        <div><span data-unit="s">00</span><small>secondi</small></div>
+      </div>
+      <p class="card__note">{luna.note}</p>
+    </article>
+
+    <article class="card parchment" data-card="fuochi">
+      <p class="card__chapter kicker">{fuochi.chapter} · {fuochi.place}</p>
+      <h2 class="card__title">{fuochi.title}</h2>
+      <ol class="programme">
+        {
+          fuochi.items.map((it) => (
+            <li class="programme__item" data-prog>
+              <span class="programme__flame" aria-hidden="true" />
+              <time class="programme__time">{it.time}</time>
+              <span class="programme__body">
+                <span class="programme__title">{it.title}</span>
+                <span class="programme__text">{it.text}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </article>
+
+    <article class="card parchment" data-card="bosco">
+      <p class="card__chapter kicker">{bosco.chapter} · {bosco.place}</p>
+      <h2 class="card__title">{WEDDING.venue}</h2>
+      <p class="card__place">{WEDDING.town}</p>
+      <p class="card__text">{bosco.text}</p>
+      <a class="btn btn--ink card__btn" href={WEDDING.mapsUrl} target="_blank" rel="noopener">{bosco.cta}</a>
+    </article>
+
+    <article class="card card--center parchment" data-card="fine">
+      <h2 class="card__title">{fine.title}</h2>
+      <p class="card__text">{fine.text}</p>
+      <a class="btn btn--ink card__btn" href="#rsvp">{fine.cta}</a>
+    </article>
+  </div>
+
+  <div class="sr-only">
+    <h2>{contea.title}</h2>
+    <p>{contea.text} {contea.invite}</p>
+    <p>{WEDDING.dateLong}, {WEDDING.venue}, {WEDDING.town}.</p>
+    <h3>Programma</h3>
+    <ul>{fuochi.items.map((it) => <li>{it.time}: {it.title}, {it.text}</li>)}</ul>
+    <p><a href={WEDDING.mapsUrl}>{bosco.cta}</a></p>
+  </div>
+</section>
+
+<style>
+  .journey {
+    position: relative;
+    background: #1d150d;
+  }
+
+  .journey__stage {
+    position: relative;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  .journey__map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .journey :global(.ink) {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .journey :global(.ink--fine) {
+    stroke-width: 1;
+  }
+  .journey :global(.ink--faint) {
+    stroke-width: 1;
+    opacity: 0.5;
+  }
+  .journey :global(.ink--tree) {
+    stroke-width: 1.2;
+    fill: #efe1c2;
+  }
+  .journey :global(.ink--door) {
+    stroke-width: 1.1;
+    fill: #6e8a68;
+  }
+  .journey :global(.ink--river) {
+    stroke-width: 1.4;
+  }
+  .journey :global(.m-fill) {
+    fill: #ead9b5;
+    stroke: none;
+  }
+  .journey :global(.moon) {
+    fill: #f2e3b8;
+    stroke-width: 1.2;
+  }
+
+  .journey :global(.lbl) {
+    fill: var(--ink);
+    paint-order: stroke;
+    stroke: #ecdcb8;
+    stroke-width: 5px;
+    stroke-linejoin: round;
+  }
+  .journey :global(.lbl--big) {
+    font-family: var(--display);
+    font-size: 30px;
+    letter-spacing: 0.32em;
+  }
+  .journey :global(.lbl--mid) {
+    font-family: var(--display);
+    font-size: 21px;
+    letter-spacing: 0.16em;
+  }
+  .journey :global(.lbl--it) {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 22px;
+  }
+  .journey :global(.lbl--small) {
+    font-size: 17px;
+  }
+  .journey :global(.lbl--plain) {
+    font-size: 30px;
+    letter-spacing: 0.06em;
+    opacity: 0.85;
+  }
+  .journey :global(.lbl--title) {
+    font-family: var(--display);
+    font-size: 30px;
+    letter-spacing: 0.08em;
+    stroke: none;
+  }
+  .journey :global(.lbl--runes) {
+    font-family: var(--runic);
+    font-size: 14px;
+    letter-spacing: 0.3em;
+    fill: var(--lavender-deep);
+    stroke: none;
+  }
+  .journey :global(.cartouche .lbl) {
+    stroke: none;
+  }
+
+  .journey :global(.beacon__fire) {
+    opacity: 0;
+  }
+  .journey :global(.beacon__flame),
+  .journey :global(.beacon__core) {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: flicker 0.9s ease-in-out infinite alternate;
+  }
+  .journey :global(.beacon__core) {
+    animation-duration: 0.6s;
+  }
+  .journey :global(.beacon__glow) {
+    animation: glow 1.4s ease-in-out infinite alternate;
+  }
+  @keyframes flicker {
+    0% {
+      transform: scale(1, 1) skewX(0deg);
+    }
+    50% {
+      transform: scale(0.92, 1.12) skewX(3deg);
+    }
+    100% {
+      transform: scale(1.06, 0.94) skewX(-3deg);
+    }
+  }
+  @keyframes glow {
+    from {
+      opacity: 0.75;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .journey :global(.venue-star) {
+    opacity: 0;
+  }
+
+  .journey :global(.route__line) {
+    fill: none;
+    stroke: var(--route);
+    stroke-width: 3;
+    stroke-dasharray: 2 9;
+    stroke-linecap: round;
+  }
+  .journey :global(.seg-mask) {
+    stroke-dasharray: 2000;
+    stroke-dashoffset: 2000;
+  }
+
+  .journey :global(.traveller) {
+    opacity: 0;
+  }
+  .journey :global(.traveller__dot) {
+    fill: var(--lavender-deep);
+    stroke: #f6ecd2;
+    stroke-width: 2.5;
+  }
+  .journey :global(.traveller__core) {
+    fill: #f6ecd2;
+  }
+  .journey :global(.traveller__pulse) {
+    fill: none;
+    stroke: var(--lavender-deep);
+    stroke-width: 2;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: pulse 1.8s ease-out infinite;
+  }
+  @keyframes pulse {
+    from {
+      transform: scale(0.6);
+      opacity: 0.9;
+    }
+    to {
+      transform: scale(2.2);
+      opacity: 0;
+    }
+  }
+
+  .journey__mist {
+    position: absolute;
+    inset: 0;
+    background: #ece6f0;
+    pointer-events: none;
+  }
+
+  /* ---------- cards ---------- */
+
+  .card {
+    position: absolute;
+    z-index: var(--z-card);
+    left: var(--pad);
+    top: 0;
+    bottom: 0;
+    height: fit-content;
+    max-height: calc(100svh - 120px);
+    margin: auto 0;
+    width: min(430px, 36vw);
+    padding: 30px 30px 28px;
+    overflow: auto;
+    visibility: hidden;
+    opacity: 0;
+    border-radius: 3px;
+  }
+
+  .card--center {
+    left: 50%;
+    top: auto;
+    bottom: max(28px, env(safe-area-inset-bottom));
+    width: min(460px, calc(100vw - 24px));
+    margin: 0 0 0 calc(min(460px, calc(100vw - 24px)) / -2);
+    text-align: center;
+  }
+
+  .card__chapter {
+    color: var(--lavender-deep);
+    font-size: 0.66rem;
+  }
+
+  .card__head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 14px;
+  }
+
+  .card__title {
+    margin-top: 10px;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(1.45rem, 2.3vw, 1.9rem);
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+  }
+  .card__head .card__title {
+    margin-top: 0;
+  }
+
+  .card__text {
+    margin-top: 12px;
+    font-size: 1.12rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .card__invite {
+    margin-top: 12px;
+    font-size: 1.2rem;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .card__place {
+    margin-top: 2px;
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+  .card__hint {
+    margin-top: 10px;
+    font-family: var(--display);
+    font-size: 0.64rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--lavender-deep);
+  }
+  .card__btn {
+    margin-top: 18px;
+  }
+  .card__label {
+    margin-top: 16px;
+    color: var(--ink-soft);
+    font-size: 0.62rem;
+  }
+  .card__note {
+    margin-top: 10px;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  .medallion {
+    position: relative;
+    flex: none;
+    width: 96px;
+    height: 96px;
+  }
+  .medallion img {
+    position: absolute;
+    inset: 18%;
+    width: 64%;
+    height: 64%;
+    object-fit: cover;
+    border-radius: 50%;
+    clip-path: circle(50%);
+    transform: scale(1.18);
+  }
+  .medallion svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    animation: spin 40s linear infinite;
+  }
+  .medallion__runes {
+    font-family: var(--runic);
+    font-size: 15px;
+    letter-spacing: 3px;
+    fill: var(--lavender-deep);
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .moon-letters {
+    margin-top: 12px;
+    min-height: 1.5em;
+    font-family: var(--runic);
+    font-size: 1.05rem;
+    letter-spacing: 0.12em;
+    color: var(--lavender-deep);
+  }
+  .moon-letters :global(.ml-latin) {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.22rem;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+  }
+
+  .countdown {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .countdown div {
+    display: grid;
+    justify-items: center;
+    padding: 10px 4px 8px;
+    border: 1px solid rgb(51 40 26 / 0.3);
+    background: rgb(255 250 236 / 0.4);
+  }
+  .countdown span {
+    font-family: var(--display);
+    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .countdown small {
+    margin-top: 4px;
+    font-size: 0.82rem;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  .programme {
+    display: grid;
+    gap: 2px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .programme__item {
+    display: grid;
+    grid-template-columns: 18px 3.4em 1fr;
+    align-items: baseline;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgb(51 40 26 / 0.16);
+    opacity: 0.38;
+  }
+  .programme__item:last-child {
+    border-bottom: 0;
+  }
+  .programme__flame {
+    position: relative;
+    width: 10px;
+    height: 14px;
+    align-self: center;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: rgb(51 40 26 / 0.25);
+  }
+  .programme__flame::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: radial-gradient(circle at 50% 72%, #fde68a, #f97316 58%, #c2410c);
+    box-shadow: 0 0 10px 1px rgb(249 115 22 / 0.7);
+    opacity: var(--lit, 0);
+  }
+  .programme__time {
+    font-family: var(--display);
+    font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .programme__body {
+    display: grid;
+  }
+  .programme__title {
+    font-size: 1.12rem;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  .programme__text {
+    font-size: 0.98rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    line-height: 1.3;
+  }
+
+  @media (max-width: 899px) {
+    .card {
+      left: 12px;
+      right: 12px;
+      top: auto;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      width: auto;
+      max-height: 52svh;
+      margin: 0;
+      padding: 22px 20px 20px;
+    }
+    .card--center {
+      left: 12px;
+      width: auto;
+      margin: 0;
+    }
+    .card__title {
+      font-size: 1.35rem;
+    }
+    .card__text {
+      font-size: 1.04rem;
+      margin-top: 8px;
+    }
+    .card__invite {
+      font-size: 1.08rem;
+      margin-top: 8px;
+    }
+    .medallion {
+      width: 76px;
+      height: 76px;
+    }
+    .programme__item {
+      padding: 5px 0;
+    }
+    .programme__title {
+      font-size: 1.02rem;
+    }
+    .programme__text {
+      font-size: 0.9rem;
+    }
+    .countdown div {
+      padding: 8px 2px 6px;
+    }
+  }
+</style>

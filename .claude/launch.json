@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "fv-wedding",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "4340", "--strictPort"],
+      "cwd": "site",
+      "port": 4340
+    }
+  ]
+}
